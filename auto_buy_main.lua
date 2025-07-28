@@ -74,7 +74,7 @@ G2L["10"]["Position"] = UDim2.new(0.11336, 0, 0.18405, 0);
 
 G2L["11"] = Instance.new("UICorner", G2L["10"]);
 
--- Кнопка добавления
+-- Кнопка добавления (смещена правее)
 G2L["7"] = Instance.new("TextButton", G2L["2"]);
 G2L["7"]["BorderSizePixel"] = 0;
 G2L["7"]["TextSize"] = 20;
@@ -85,7 +85,7 @@ G2L["7"]["Size"] = UDim2.new(0, 91, 0, 34);
 G2L["7"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["7"]["Text"] = [[ADD]];
 G2L["7"]["Name"] = [[add]];
-G2L["7"]["Position"] = UDim2.new(0.32336, 0, 0.18405, 0);
+G2L["7"]["Position"] = UDim2.new(0.52336, 0, 0.18405, 0); -- Смещено правее
 
 G2L["8"] = Instance.new("UICorner", G2L["7"]);
 
@@ -174,6 +174,28 @@ end
 local function toggleAntiAfk()
     antiAfkEnabled = not antiAfkEnabled
     G2L["10"].BackgroundColor3 = antiAfkEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+    
+    if antiAfkEnabled then
+        spawn(function()
+            while antiAfkEnabled do
+                humanoid.Jump = true
+                wait(30) -- Прыжок каждые 30 секунд
+            end
+        end)
+    end
+end-- Функция переключения ANTI-AFK
+local function toggleAntiAfk()
+    antiAfkEnabled = not antiAfkEnabled
+    G2L["10"].BackgroundColor3 = antiAfkEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+    
+    if antiAfkEnabled then
+        spawn(function()
+            while antiAfkEnabled do
+                humanoid.Jump = true
+                wait(30) -- Прыжок каждые 30 секунд
+            end
+        end)
+    end
 end
 
 -- Функция обновления списка целей
@@ -287,19 +309,6 @@ uis.InputBegan:Connect(function(input, gp)
 end)
 
 runService.RenderStepped:Connect(function(dt)
-    -- ANTI-AFK система
-    if antiAfkEnabled and os.time() - lastAfkAction >= 30 then
-        lastAfkAction = os.time()
-        humanoid.Jump = true
-        local root = character:FindFirstChild("HumanoidRootPart")
-        if root then
-            local originalPos = root.Position
-            humanoid:MoveTo(originalPos + Vector3.new(-4, 0, 0))
-            task.wait(0.5)
-            humanoid:MoveTo(originalPos + Vector3.new(4, 0, 0))
-        end
-    end
-
     if menuOpen then
         updateTargetInfo()
     end
